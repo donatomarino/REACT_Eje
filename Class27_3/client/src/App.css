@@ -38,7 +38,7 @@ footer {
   margin-top: 20px;
 }
 
-#title-main {
+#title-main, #title-cart {
   text-align: center;
   padding: 20px;
   font-size: 3em;

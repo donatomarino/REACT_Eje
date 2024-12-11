@@ -1,17 +1,24 @@
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
+import { useEffect, useState } from "react";
 
-// Un componente que representa un solo producto
-export default function Product({src, up, name, addToCart }) {
+export default function Product({url, up, name, addToCart }) {
+    const [precio, setPrecio] = useState();
+    
+    useEffect(() =>{
+        setPrecio(Math.floor(Math.random() * (100 - 10) + 10));
+    }, [])
+
     return (
         <Card
             bg="danger"
             style={{ width: '18rem', margin: '10px', textAlign: 'center' }}
             className="card-product"
         >
-            <Card.Img variant="top" src={src} />
+            <Card.Img variant="top" src={url} />
             <Card.Body>
                 <Card.Title>{up(name)}</Card.Title>
+                <Card.Text>Precio: {precio} €</Card.Text>
                 <Button
                     variant="warning"
                     onClick={() => addToCart(name)}

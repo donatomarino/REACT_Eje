@@ -1,44 +1,49 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import useFetch from "../hooks/useFetch";
 import Product from "../components/Product";
 // import fetch from "../hooks/fetch";
 
 export default function Home() {
-    // Usamos nuestro Hook
-    const [setPokemon, searchData] = useFetch();
-
     const [allPokemon, setAllPokemon] = useState([]);
 
     const [cart, setCart] = useState([]);
 
     // Para recoger todos los pokemons y crear sus botones
     useEffect(() => {
-        fetch(`https://pokeapi.co/api/v2/pokemon/?offset=0&limit=20`)
-            .then((res) => res.json())
-            .then((res) => {
-                let pokemons = [];
+        const storedPokemons = localStorage.getItem('pokemons');
 
-                res.results.map((r) => {
-                    fetch(`https://pokeapi.co/api/v2/pokemon/${r.name}`)
-                        .then((data) => data.json())
-                        .then((data) => {
-                            pokemons.push({
-                                name: data.name,
-                                image: data.sprites.other.home.front_default,
+        if (storedPokemons) {
+            // Si hay pokemons almacenados, usarlos
+            setAllPokemon(JSON.parse(storedPokemons));
+        } else {
+            // Si no hay pokemons almacenados, hacer fetch y almacenarlos
+            fetch(`https://pokeapi.co/api/v2/pokemon/?offset=20&limit=20`)
+                .then((res) => res.json())
+                .then((res) => {
+                    let pokemons = [];
+
+                    res.results.map((r) =>
+                        fetch(`https://pokeapi.co/api/v2/pokemon/${r.name}`)
+                            .then((data) => data.json())
+                            .then((data) => {
+                                pokemons.push({
+                                    name: data.name,
+                                    image: data.sprites.other.home.front_default,
+                                });
                             })
-                        })
-                        .catch(e => console.log(e));
+                            .catch(e => console.log(e))
+                    ).then(() => {
+                        // Al finalizar todas las peticiones, guardar los pokemons en localStorage
+                        setAllPokemon(pokemons);
+                        localStorage.setItem('pokemons', JSON.stringify(pokemons));
+                    });
                 })
+                .catch((e) => console.log(e));
 
-                setAllPokemon(pokemons.sort());
-            });
+            console.log(allPokemon)
+        }
     }, []);
 
-    // Está predeterminado Pikachu.
-    useEffect(() => {
-        setPokemon("pikachu");
-    }, []);
 
     // Devolvemos la primera letra del nombre en mayuscula
     const toUpper = (name) => {
@@ -59,13 +64,12 @@ export default function Home() {
             <div className="container-productos">
                 {allPokemon
                     ? allPokemon.map((pokemon) => {
-                        console.log(pokemon)
                         return (
-                            <Product 
-                                src = {pokemon.image}
-                                up = {toUpper}
-                                name = {pokemon.name}
-                                addToCart = {handleAddToCart}
+                            <Product
+                                url={pokemon.image}
+                                up={toUpper}
+                                name={pokemon.name}
+                                addToCart={handleAddToCart}
                             />
                         )
                     })

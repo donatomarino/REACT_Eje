@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import ProductsCart from "../components/ProductsCart";
 
 const Cart = () => {
-    const productos = localStorage.getItem('cart');
-    console.log(productos)
+  const productos = JSON.parse(localStorage.getItem('cart'));
+
   return (
-    <ProductsCart 
-      productos = {productos}
+    <ProductsCart
+      prod={productos}
+      quantity="0"
     />
   );
 }
